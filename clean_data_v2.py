@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 import sys
 from sklearn.preprocessing import LabelEncoder
+from ydata_profiling import ProfileReport
 
 
 
@@ -109,9 +110,11 @@ if __name__ == "__main__":
     # Parse arguments
     args = parser.parse_args()
 
-    # Load the DataFrame
+    # Load the DataFrame and generate data report
     print(f"Attempting to load file from: {args.input}")
     df = pd.read_csv(args.input)
+    profile = ProfileReport(df,explorative=True)
+    profile.to_file("report.html")
 
     try:
         # Convert comma-separated string to a list of columns to drop. strip to remove whitespace after
