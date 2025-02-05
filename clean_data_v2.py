@@ -93,7 +93,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Clean and drop specified columns from a DataFrame")
     parser.add_argument(
     "--columns", 
-    required=True, 
+    required=False, 
     help="Comma-separated column names to drop, e.g., 'Age,City'"
 )
     parser.add_argument(
