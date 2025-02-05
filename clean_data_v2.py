@@ -4,6 +4,8 @@ import numpy as np
 import sys
 from sklearn.preprocessing import LabelEncoder
 from ydata_profiling import ProfileReport
+import os
+import openpyxl
 
 
 
@@ -88,6 +90,34 @@ def clean_data(df):
     
     return df
 
+def load_file(file_path):
+
+    ext = os.path.splitext(file_path)[-1].lower()  # Get the file extension
+    
+    if ext == ".csv":
+        return pd.read_csv(file_path)
+    
+    elif ext in [".xls", ".xlsx"]:
+        return pd.read_excel(file_path, engine="openpyxl")
+    
+    elif ext == ".json":
+        return pd.read_json(file_path)
+    
+    elif ext == ".parquet":
+        return pd.read_parquet(file_path)
+    
+    elif ext == ".html":
+        return pd.read_html(file_path)[0]  # Reads first table from HTML
+    
+    elif ext == ".xml":
+        return pd.read_xml(file_path)
+    
+    elif ext == ".zip":
+        return pd.read_csv(file_path, compression="zip")  # Assumes ZIP contains a CSV
+    
+    else:
+        raise ValueError(f"Unsupported file format: {ext}")
+
 if __name__ == "__main__":
     # Set up argument parsing   
     parser = argparse.ArgumentParser(description="Clean and drop specified columns from a DataFrame")
@@ -110,24 +140,30 @@ if __name__ == "__main__":
     # Parse arguments
     args = parser.parse_args()
 
-    # Load the DataFrame and generate data report
+    # Load the DataFrame
     print(f"Attempting to load file from: {args.input}")
-    df = pd.read_csv(args.input)
+    file_path = f"{args.input}"
+    #df = pd.read_csv(args.input)
+    df = load_file(file_path)
     profile = ProfileReport(df,explorative=True)
     profile.to_file("report.html")
 
     try:
-        # Convert comma-separated string to a list of columns to drop. strip to remove whitespace after
-        columns_to_drop = [col.strip() for col in args.columns.split(",")]
-        
-        # Check if all columns exist in the DataFrame
-        invalid_columns = [col for col in columns_to_drop if col not in df.columns]
-        if invalid_columns:
-            raise ValueError(f"The following columns cannot be dropped as they do not exist in the DataFrame: {invalid_columns}")
+        if not args.columns:
+            print("No columns dropped")
         else:
-            # Drop valid columns
-            df = df.drop(columns=columns_to_drop)
-            print(f"Successfully dropped columns: {columns_to_drop}")
+            # Convert comma-separated string to a list of columns to drop. strip to remove whitespace after
+            columns_to_drop = [col.strip() for col in args.columns.split(",")]
+        
+            # Check if all columns exist in the DataFrame
+            invalid_columns = [col for col in columns_to_drop if col not in df.columns]
+            if invalid_columns:
+             raise ValueError(f"The following columns cannot be dropped as they do not exist in the DataFrame: {invalid_columns}")
+            else:
+             # Drop valid columns
+                df = df.drop(columns=columns_to_drop)
+                print(f"Successfully dropped columns: {columns_to_drop}")
+
     except ValueError as e:
         print(f'Error {e}. Please try again') 
         sys.exit(1) 
