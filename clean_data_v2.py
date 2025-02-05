@@ -129,12 +129,12 @@ if __name__ == "__main__":
     parser.add_argument(
     "--input", 
     required=True, 
-    help="Path to the CSV file to clean"
+    help="Path to the data file to clean"
 )
     parser.add_argument(
     "--output", 
     required=True, 
-    help="Path to save the cleaned CSV file"
+    help="Path to save the cleaned data file"
 )
    
     # Parse arguments
