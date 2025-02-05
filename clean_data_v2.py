@@ -143,7 +143,6 @@ if __name__ == "__main__":
     # Load the DataFrame
     print(f"Attempting to load file from: {args.input}")
     file_path = f"{args.input}"
-    #df = pd.read_csv(args.input)
     df = load_file(file_path)
     profile = ProfileReport(df,explorative=True)
     profile.to_file("report.html")
