@@ -142,6 +142,6 @@ if __name__ == "__main__":
     # Insights
     df_info = data_summary(df)
 
-    # Save the cleaned DataFrame to the specified output path
+    # Save the insights to the specified output path
     print(df_info)
     print(f"Data insights saved to {args.output}")
