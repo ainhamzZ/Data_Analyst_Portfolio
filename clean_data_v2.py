@@ -40,7 +40,7 @@ def clean_data(df):
             break  # Exit loop if successful
 
         except ValueError as e:
-            print(f"Error: {e}. Please try again. ")
+            print(f"Error: {e}")
 
 # 2. Impute missing values for numerical columns with median
     while True:
@@ -70,7 +70,7 @@ def clean_data(df):
             break  # Exit loop if successful
 
         except ValueError as e:
-            print(f"Error: {e}. Please try again . ")            
+            print(f"Error: {e}")            
 
     # 3. Fill missing values and encode for categorical columns
     while True:
@@ -103,7 +103,7 @@ def clean_data(df):
             break  # Exit loop if successful
 
         except ValueError as e:
-            print(f"Error: {e}. Please try again")
+            print(f"Error: {e}")
     
     return df
 
@@ -112,7 +112,7 @@ def load_file(file_path):
     while True:
         try:
             if not os.path.exists(file_path):
-                raise FileNotFoundError(f'{file_path} does not exist. Please enter correct file path') 
+                raise FileNotFoundError(f'The file path : "{file_path}" does not exist.') 
             else:
                 ext = os.path.splitext(file_path)[-1].lower()  # Get the file extension    
                 if ext == ".csv":
@@ -135,7 +135,7 @@ def load_file(file_path):
                     raise ValueError(f"Unsupported file format: {ext}. Please try CSV, Excel, JSON, Parquet, HTML, XML, or ZIP.")
         
         except FileNotFoundError as e:
-            print(f"Error {e}")
+            print(f"Error: {e}")
             file_path = input("Please enter the correct file path: ")
    
 
