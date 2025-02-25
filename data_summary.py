@@ -145,3 +145,77 @@ if __name__ == "__main__":
     # Save the insights to the specified output path
     print(df_info)
     print(f"Data insights saved to {args.output}")
+
+def data_summary_wout_args(df):
+
+    # Generate the HTML content from df.head() and df.describe()
+    html_head = df.head().to_html()
+
+    html_describe = df.describe().to_html()
+
+    # Generate Data Information from df.info
+    buffer = StringIO() # creates in-mmeory buffer
+    df.info(buf=buffer)
+    info_str = buffer.getvalue()
+
+    # Generate Unique Values in Columns
+    unique_list=[]
+    for i in df.columns:
+        unique_val = df[i].unique() 
+        unique_count = df[i].nunique()  # number of unique values
+        unique_list.append({
+        'Column': i,
+        'Unique Values': unique_val,
+        'Number of Unique Values': unique_count
+    })
+    unique_df = pd.DataFrame(unique_list)
+    unique_df_html = unique_df.to_html() 
+
+    # Generate NULL Values in Columns
+    null_list=[]
+    for i in df.columns:
+        i_null = len(df[pd.isnull(df[i])])
+        null_list.append({
+            'Column': i,
+            'Number of NULLs': i_null
+        })
+    null_df = pd.DataFrame(null_list)
+    null_df_html = null_df.to_html()
+
+    user_output = input("Type in report name to be generated followed by .html : ")
+    # Create a new report (HTML file)
+    with open(f"{user_output}", "w") as file:
+        file.write("<html><head><title>Data Report</title></head><body>\n")  # Add HTML structure
+        file.write("<h2>First 5 Rows of Data</h2>\n")  # Heading
+        file.write(html_head)  # Insert the DataFrame as HTML table
+        file.write("<br />")
+        file.write("<hr>\n")  # Add a separator      
+        file.write("<h2>DataFrame Information</h2>\n")
+        file.write("<pre>" + info_str + "</pre>\n")  # Use <pre> tag for formatted text
+        file.write("<br />")
+        file.write("<hr>\n")
+        file.write("<h2>Number of columns</h2>\n")
+        file.write(str(len(df.columns)))
+        file.write("<br />")
+        file.write("<hr>\n")
+        file.write("<h2>Number of records</h2>\n")
+        file.write(str(len(df)))
+        file.write("<br />")
+        file.write("<hr>\n")
+        file.write("<h2>Summary Statistics for DataFrame</h2>\n")
+        file.write(html_describe)
+        file.write("<br />")
+        file.write("<hr>\n")
+        file.write("<h2>Unique Values in Columns</h2>\n")
+        file.write(unique_df_html)
+        file.write("<br />")
+        file.write("<hr>\n")
+        file.write("<h2>NULL Values in Columns</h2>\n")
+        file.write(null_df_html)
+        file.write("<br />")
+        file.write("<p><b>End of report</b></p>\n")
+        file.write("</body></html>")  # Close the HTML tags
+
+    print("New HTML report created successfully!")
+
+    return user_output
