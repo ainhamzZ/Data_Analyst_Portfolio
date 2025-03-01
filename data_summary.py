@@ -20,7 +20,7 @@ def load_file(file_path):
                 elif ext == ".txt":
                     return pd.read_csv(file_path,sep=',')                 
                 elif ext in [".xls", ".xlsx"]:
-                    return pd.read_excel(file_path, engine="openpyxl")
+                    return pd.read_excel(file_path, engine="openpyxl", header=0)
                 elif ext == ".json":
                     return pd.read_json(file_path)
                 elif ext == ".parquet":
@@ -63,6 +63,13 @@ def data_summary(df):
     unique_df = pd.DataFrame(unique_list)
     unique_df_html = unique_df.to_html() 
 
+    # Count total duplicate rows
+    duplicate_count = df.duplicated().sum()
+
+    # Find duplicates in DF
+    duplicates = df[df.duplicated()]
+    duplicates_df_html = duplicates.to_html()
+    
     # Generate NULL Values in Columns
     null_list=[]
     for i in df.columns:
@@ -102,6 +109,13 @@ def data_summary(df):
         file.write(unique_df_html)
         file.write("<br />")
         file.write("<hr>\n")
+        file.write("<h2>Number of Duplicates in Columns</h2>\n")
+        file.write(str(duplicate_count))
+        file.write("<br />")
+        file.write("<h2>Duplicates in Columns</h2>\n")
+        file.write(duplicates_df_html)
+        file.write("<br />")
+        file.write("<hr>\n")        
         file.write("<h2>NULL Values in Columns</h2>\n")
         file.write(null_df_html)
         file.write("<br />")
@@ -146,6 +160,7 @@ if __name__ == "__main__":
     print(df_info)
     print(f"Data insights saved to {args.output}")
 
+
 def data_summary_wout_args(df):
 
     # Generate the HTML content from df.head() and df.describe()
@@ -169,7 +184,14 @@ def data_summary_wout_args(df):
         'Number of Unique Values': unique_count
     })
     unique_df = pd.DataFrame(unique_list)
-    unique_df_html = unique_df.to_html() 
+    unique_df_html = unique_df.to_html()
+
+    # Count total duplicate rows
+    duplicate_count = df.duplicated().sum()
+
+    # Find duplicates in DF
+    duplicates = df[df.duplicated()]
+    duplicates_df_html = duplicates.to_html() 
 
     # Generate NULL Values in Columns
     null_list=[]
@@ -208,6 +230,13 @@ def data_summary_wout_args(df):
         file.write("<hr>\n")
         file.write("<h2>Unique Values in Columns</h2>\n")
         file.write(unique_df_html)
+        file.write("<br />")
+        file.write("<hr>\n")
+        file.write("<h2>Number of Duplicates in Columns</h2>\n")
+        file.write(str(duplicate_count))
+        file.write("<br />")
+        file.write("<h2>Duplicates in Columns</h2>\n")
+        file.write(duplicates_df_html)
         file.write("<br />")
         file.write("<hr>\n")
         file.write("<h2>NULL Values in Columns</h2>\n")
