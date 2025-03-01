@@ -11,6 +11,16 @@ import openpyxl
 
 def clean_data(df):
 
+# Drop duplicate rows
+    while True:
+        try :
+            df_no_duplicates = df.drop_duplicates()
+            dropped_count = len(df) - len(df_no_duplicates)
+            print(f'{dropped_count} duplicate rows dropped!')
+            break  # Exit loop if successful
+
+        except ValueError as e:
+            print(f"Error: {e}")
 
 # 1. Impute missing values for numerical columns with mean
     while True:
@@ -29,13 +39,13 @@ def clean_data(df):
                 else:
                     # Validate and impute mean for numerical columns
                     for col in input_cols_mean:
-                        if col not in df.columns:
+                        if col not in df_no_duplicates.columns:
                             raise ValueError(f"'{col}' is not a valid numerical column.")
-                        elif not df[col].isnull().any():  # Check if the column has missing values
+                        elif not df_no_duplicates[col].isnull().any():  # Check if the column has missing values
                             print(f"No missing values in '{col}'.") 
                         else: 
-                            df[col].fillna(df[col].mean(), inplace=True)  # Impute with mean
-                            print(f"Missing values in '{col}' filled with mean: {df[col].mean()}")
+                            df_no_duplicates[col].fillna(df_no_duplicates[col].mean(), inplace=True)  # Impute with mean
+                            print(f"Missing values in '{col}' filled with mean: {df_no_duplicates[col].mean()}")
            
             break  # Exit loop if successful
 
@@ -59,13 +69,13 @@ def clean_data(df):
                 else:
                     # Validate and impute mean for numerical columns
                     for col in input_cols_median:
-                        if col not in df.columns:
+                        if col not in df_no_duplicates.columns:
                             raise ValueError(f"'{col}' is not a valid numerical column.")
-                        elif not df[col].isnull().any():  # Check if the column has missing values
+                        elif not df_no_duplicates[col].isnull().any():  # Check if the column has missing values
                             print(f"No missing values in '{col}'.") 
                         else: 
-                            df[col].fillna(df[col].median(), inplace=True)  # Impute with median
-                            print(f"Missing values in '{col}' filled with median: {df[col].median()}")
+                            df_no_duplicates[col].fillna(df_no_duplicates[col].median(), inplace=True)  # Impute with median
+                            print(f"Missing values in '{col}' filled with median: {df_no_duplicates[col].median()}")
 
             break  # Exit loop if successful
 
@@ -90,15 +100,15 @@ def clean_data(df):
                     # Validate and impute mode for categorical columns
                     label_encoder = LabelEncoder()
                     for col in input_cols_mode:
-                        if col not in df.columns:
+                        if col not in df_no_duplicates.columns:
                             raise ValueError(f"'{col}' is not a valid categorical column.")
-                        elif not df[col].isnull().any():  # Check if the column has missing values
+                        elif not df_no_duplicates[col].isnull().any():  # Check if the column has missing values
                             print(f"No missing values in '{col}'.")                        
                         else:
-                            df[col].fillna(df[col].mode()[0], inplace=True)  # Impute with mode
-                            print(f"Missing values in '{col}' filled with mode: {df[col].mode()[0]}")                 
+                            df_no_duplicates[col].fillna(df_no_duplicates[col].mode()[0], inplace=True)  # Impute with mode
+                            print(f"Missing values in '{col}' filled with mode: {df_no_duplicates[col].mode()[0]}")                 
                             # Apply label encoding
-                            df[col] = label_encoder.fit_transform(df[col])
+                            df_no_duplicates[col] = label_encoder.fit_transform(df_no_duplicates[col])
                             print(f"'{col}' has been label encoded.")
             break  # Exit loop if successful
 
