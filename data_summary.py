@@ -6,6 +6,10 @@ from ydata_profiling import ProfileReport
 import os
 import openpyxl
 from io import StringIO
+import matplotlib.pyplot as plt
+import seaborn as sns
+from io import BytesIO
+import base64
 
 def load_file(file_path):
 
@@ -116,6 +120,21 @@ def data_summary(df):
                                 'Upper bound' : upper_bound,
                                 'Outliers' : outliers
                             })
+                            # Step 3: Plot Boxplot for Outliers and Save it as an Image
+                            plt.figure(figsize=(6, 4))
+                            sns.boxplot(x=df[col], color='salmon')
+                            plt.title(f"Outliers in {col}", fontsize=14)
+                            plt.xlabel(col)
+
+                            # Save the plot to a BytesIO object (in-memory image)
+                            img_buffer = BytesIO()
+                            plt.savefig(img_buffer, format='png')
+                            img_buffer.seek(0)
+
+                            # Convert the image to base64 encoding for embedding in HTML
+                            img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+                            img_buffer.close()
+
                     outliers_df = pd.DataFrame(outlier_col_list)
                     outliers_df_html = outliers_df.to_html()
                                        
@@ -200,6 +219,9 @@ def data_summary(df):
         file.write("<br />")
         file.write("<h2>Outliers in Columns</h2>\n")
         file.write(outliers_df_html)
+        file.write("<h3>Boxplot of UnitPrice (with Outliers):</h3>")
+        file.write(f"<img src='data:image/png;base64,{img_base64}' alt='Boxplot' />\n")        
+        file.write("<hr>\n")       
         file.write("<br />")
         file.write("<hr>\n")
         file.write(outliers_z_df_html)
@@ -323,6 +345,22 @@ def data_summary_wout_args(df):
                                 'Upper bound' : upper_bound,
                                 'Outliers' : outliers
                             })
+
+                            # Step 3: Plot Boxplot for Outliers and Save it as an Image
+                            plt.figure(figsize=(6, 4))
+                            sns.boxplot(x=df[col], color='salmon')
+                            plt.title(f"Outliers in {col}", fontsize=14)
+                            plt.xlabel(col)
+
+                            # Save the plot to a BytesIO object (in-memory image)
+                            img_buffer = BytesIO()
+                            plt.savefig(img_buffer, format='png')
+                            img_buffer.seek(0)
+
+                            # Convert the image to base64 encoding for embedding in HTML
+                            img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+                            img_buffer.close()
+
                     outliers_df = pd.DataFrame(outlier_col_list)
                     outliers_df_html = outliers_df.to_html()
                                        
@@ -406,9 +444,11 @@ def data_summary_wout_args(df):
         file.write(null_df_html)
         file.write("<br />")
         file.write("<h2>Outliers in Columns</h2>\n")
-        file.write(outliers_df_html)
-        file.write("<br />")   
+        file.write(outliers_df_html)   
+        file.write("<h3>Boxplot of UnitPrice (with Outliers):</h3>")
+        file.write(f"<img src='data:image/png;base64,{img_base64}' alt='Boxplot' />\n")        
         file.write("<hr>\n")
+        file.write("<br />")
         file.write(outliers_z_df_html)
         file.write("<br />")                   
         file.write("<p><b>End of report</b></p>\n")
