@@ -82,6 +82,85 @@ def data_summary(df):
     null_df_html = null_df.to_html()
 
 
+    while True :
+        try :
+            # Step 1: Calculate Q1, Q3, and IQR
+            col_outlier = input("How many columns are you investigating for outliers: ")
+            if not col_outlier.isdigit():
+                raise ValueError(f"'{col_outlier}' is not a valid number. Please enter a valid number.")
+            elif col_outlier == '0':
+                print("No columns selected for outliers")
+            else:
+                col_outlier = int(col_outlier)
+                input_col_outlier = input(f"Please enter {col_outlier} column name(s), separated by spaces for outliers: ").split()
+                if len(input_col_outlier) != col_outlier:
+                    raise ValueError(f"You must enter exactly {col_outlier} column names.")
+                else:
+                    outlier_col_list = [] 
+                    for col in input_col_outlier:
+                        if col not in df.columns:
+                            raise ValueError(f"'{col}' is not found in table.")
+                        else:                                              
+                            Q1 = df[col].quantile(0.25)
+                            Q3 = df[col].quantile(0.75)
+                            IQR = Q3 - Q1
+                            lower_bound = Q1 - 1.5 * IQR
+                            upper_bound = Q3 + 1.5 * IQR
+                            outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
+                            outlier_col_list.append({
+                                'Column': col,
+                                'Q1' : Q1,
+                                'Q3' : Q3,
+                                'IQR' : IQR,
+                                'Lower bound' : lower_bound,
+                                'Upper bound' : upper_bound,
+                                'Outliers' : outliers
+                            })
+                    outliers_df = pd.DataFrame(outlier_col_list)
+                    outliers_df_html = outliers_df.to_html()
+                                       
+
+            break
+        except ValueError as e:
+            print(f"Error: {e}")
+
+    while True :
+        try :
+            # Step 1: Calculate Z-Score
+            col_Z_score = input("How many columns are you computing for Z-Score: ")
+            if not col_Z_score.isdigit():
+                raise ValueError(f"'{col_Z_score}' is not a valid number. Please enter a valid number.")
+            elif col_Z_score == '0':
+                print("No columns selected for outliers")
+            else:
+                col_Z_score = int(col_Z_score)
+                input_col_Z = input(f"Please enter {col_Z_score} column name(s), separated by spaces for outliers: ").split()
+                if len(input_col_Z) != col_Z_score:
+                    raise ValueError(f"You must enter exactly {col_Z_score} column names.")
+                else:
+                    col_z_list = []
+                    for col in input_col_Z:
+                        if col not in df.columns:
+                            raise ValueError(f"'{col}' is not found in table.")
+                        else:
+                            mean = df[col].mean()
+                            std_dev = df[col].std()                           
+                            z_scores = (df[col] - mean) / std_dev 
+                            col_z_list.append({
+                                'Column': col,
+                                'Mean' : mean,
+                                'Standard Deviation' : std_dev,
+                                'Z-score' : z_scores.tolist()
+                            })
+                    outliers_z_df = pd.DataFrame(col_z_list)
+                    outliers_z_df_html = outliers_z_df.to_html()
+                                       
+
+            break
+        except ValueError as e:
+            print(f"Error: {e}")
+
+
     # Create a new report (HTML file)
     with open(f"{args.output}", "w") as file:
         file.write("<html><head><title>Data Report</title></head><body>\n")  # Add HTML structure
@@ -119,6 +198,12 @@ def data_summary(df):
         file.write("<h2>NULL Values in Columns</h2>\n")
         file.write(null_df_html)
         file.write("<br />")
+        file.write("<h2>Outliers in Columns</h2>\n")
+        file.write(outliers_df_html)
+        file.write("<br />")
+        file.write("<hr>\n")
+        file.write(outliers_z_df_html)
+        file.write("<br />")                
         file.write("<p><b>End of report</b></p>\n")
         file.write("</body></html>")  # Close the HTML tags
 
@@ -204,6 +289,84 @@ def data_summary_wout_args(df):
     null_df = pd.DataFrame(null_list)
     null_df_html = null_df.to_html()
 
+    while True :
+        try :
+            # Step 1: Calculate Q1, Q3, and IQR
+            col_outlier = input("How many columns are you investigating for outliers: ")
+            if not col_outlier.isdigit():
+                raise ValueError(f"'{col_outlier}' is not a valid number. Please enter a valid number.")
+            elif col_outlier == '0':
+                print("No columns selected for outliers")
+            else:
+                col_outlier = int(col_outlier)
+                input_col_outlier = input(f"Please enter {col_outlier} column name(s), separated by spaces for outliers: ").split()
+                if len(input_col_outlier) != col_outlier:
+                    raise ValueError(f"You must enter exactly {col_outlier} column names.")
+                else:
+                    outlier_col_list=[]
+                    for col in input_col_outlier:
+                        if col not in df.columns:
+                            raise ValueError(f"'{col}' is not found in table.")
+                        else:                           
+                            Q1 = df[col].quantile(0.25)
+                            Q3 = df[col].quantile(0.75)
+                            IQR = Q3 - Q1
+                            lower_bound = Q1 - 1.5 * IQR
+                            upper_bound = Q3 + 1.5 * IQR
+                            outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
+                            outlier_col_list.append({
+                                'Column': col,
+                                'Q1' : Q1,
+                                'Q3' : Q3,
+                                'IQR' : IQR,
+                                'Lower bound' : lower_bound,
+                                'Upper bound' : upper_bound,
+                                'Outliers' : outliers
+                            })
+                    outliers_df = pd.DataFrame(outlier_col_list)
+                    outliers_df_html = outliers_df.to_html()
+                                       
+
+            break
+        except ValueError as e:
+            print(f"Error: {e}")
+
+    while True :
+        try :
+            # Step 1: Calculate Z-Score
+            col_Z_score = input("How many columns are you computing for Z-Score: ")
+            if not col_Z_score.isdigit():
+                raise ValueError(f"'{col_Z_score}' is not a valid number. Please enter a valid number.")
+            elif col_Z_score == '0':
+                print("No columns selected for outliers")
+            else:
+                col_Z_score = int(col_Z_score)
+                input_col_Z = input(f"Please enter {col_Z_score} column name(s), separated by spaces for outliers: ").split()
+                if len(input_col_Z) != col_Z_score:
+                    raise ValueError(f"You must enter exactly {col_Z_score} column names.")
+                else:
+                    col_z_list = []
+                    for col in input_col_Z:
+                        if col not in df.columns:
+                            raise ValueError(f"'{col}' is not found in table.")
+                        else:
+                            mean = df[col].mean()
+                            std_dev = df[col].std()                           
+                            z_scores = (df[col] - mean) / std_dev 
+                            col_z_list.append({
+                                'Column': col,
+                                'Mean' : mean,
+                                'Standard Deviation' : std_dev,
+                                'Z-Score' : z_scores.tolist()
+                            })
+                    outliers_z_df = pd.DataFrame(col_z_list)
+                    outliers_z_df_html = outliers_z_df.to_html()
+                                       
+
+            break
+        except ValueError as e:
+            print(f"Error: {e}")
+
     user_output = input("Type in report name to be generated followed by .html : ")
     # Create a new report (HTML file)
     with open(f"{user_output}", "w") as file:
@@ -242,6 +405,12 @@ def data_summary_wout_args(df):
         file.write("<h2>NULL Values in Columns</h2>\n")
         file.write(null_df_html)
         file.write("<br />")
+        file.write("<h2>Outliers in Columns</h2>\n")
+        file.write(outliers_df_html)
+        file.write("<br />")   
+        file.write("<hr>\n")
+        file.write(outliers_z_df_html)
+        file.write("<br />")                   
         file.write("<p><b>End of report</b></p>\n")
         file.write("</body></html>")  # Close the HTML tags
 
