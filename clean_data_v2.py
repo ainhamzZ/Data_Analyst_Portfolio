@@ -2,11 +2,10 @@ import pandas as pd
 import argparse
 import numpy as np
 import sys
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder,MinMaxScaler,StandardScaler
 from ydata_profiling import ProfileReport
 import os
 import openpyxl
-
 
 
 def clean_data(df):
@@ -60,7 +59,7 @@ def clean_data(df):
             if not num_cols_median.isdigit():
                 raise ValueError(f"'{num_cols_median}' is not a valid number. Please enter a valid number.")
             elif num_cols_median == '0':
-                print("No columns selected to impute mean")
+                print("No columns selected to impute median")
             else:
                 num_cols_median = int(num_cols_median)
                 input_cols_median = input(f"Please enter {num_cols_median} numerical column names, separated by spaces: ").split()
@@ -90,7 +89,7 @@ def clean_data(df):
             if not cat_cols.isdigit():
                 raise ValueError(f"'{cat_cols}' is not a valid number. Please enter a valid number.")
             elif cat_cols == '0':
-                print("No columns selected to impute mean")  
+                print("No columns selected to impute mode")  
             else:
                 cat_cols = int(cat_cols)                                         
                 input_cols_mode = input(f"Please enter {cat_cols} categorical column names, separated by spaces: ").split()
@@ -114,7 +113,54 @@ def clean_data(df):
 
         except ValueError as e:
             print(f"Error: {e}")
-    
+
+    # 4. Min-Max Scaling
+    while True:
+        try:
+            # Ask how many columns the user wants to select for mix-max normmalisation
+            minmax_cols = input(f"How many columns would you like to apply min-max normalisation: ")
+            if not minmax_cols.isdigit():
+                raise ValueError(f"'{minmax_cols}' is not a valid number. Please enter a valid number.")
+            elif minmax_cols == '0':
+                print("No columns selected for min-max normalisation")  
+            else:
+                minmax_cols = int(minmax_cols)                                         
+                input_minmax_cols = input(f"Please enter {minmax_cols} column names, separated by spaces: ").split()
+                if len(input_minmax_cols) != minmax_cols:
+                    raise ValueError(f"You must enter exactly {minmax_cols} column names.")
+                else:
+                    scaler = MinMaxScaler()
+                    df[input_minmax_cols] = scaler.fit_transform(df[input_minmax_cols])     
+                    print(f"'Min-Max normlisation has been applied to the following columns {input_minmax_cols}'.")
+            break  # Exit loop if successful
+
+        except ValueError as e:
+            print(f"Error: {e}")
+
+    # 5. Z-score (Standardization)
+    while True:
+        try:
+            # Ask how many columns the user wants to select for Z-score normmalisation
+            z_cols = input(f"How many columns would you like to apply Z-score normalisation: ")
+            if not z_cols.isdigit():
+                raise ValueError(f"'{z_cols}' is not a valid number. Please enter a valid number.")
+            elif z_cols == '0':
+                print("No columns selected for Z-score normalisation")  
+            else:
+                z_cols = int(z_cols)                                         
+                input_z_cols = input(f"Please enter {z_cols} column names, separated by spaces: ").split()
+                if len(input_z_cols) != z_cols:
+                    raise ValueError(f"You must enter exactly {z_cols} column names.")
+                else:
+                    scaler = StandardScaler()
+                    df[input_z_cols] = scaler.fit_transform(df[input_z_cols])     
+                    print(f"'Z-score (Standardization) normlisation has been applied to the following columns {input_z_cols}'.")
+            break  # Exit loop if successful
+
+        except ValueError as e:
+            print(f"Error: {e}")
+
+
     return df
 
 def load_file(file_path):
