@@ -101,6 +101,7 @@ def data_summary(df):
                     raise ValueError(f"You must enter exactly {col_outlier} column names.")
                 else:
                     outlier_col_list = [] 
+                    outlier_data_list = []
                     for col in input_col_outlier:
                         if col not in df.columns:
                             raise ValueError(f"'{col}' is not found in table.")
@@ -117,27 +118,39 @@ def data_summary(df):
                                 'Q3' : Q3,
                                 'IQR' : IQR,
                                 'Lower bound' : lower_bound,
-                                'Upper bound' : upper_bound,
-                                'Outliers' : outliers
+                                'Upper bound' : upper_bound
                             })
-                            # Step 3: Plot Boxplot for Outliers and Save it as an Image
-                            plt.figure(figsize=(6, 4))
-                            sns.boxplot(x=df[col], color='salmon')
-                            plt.title(f"Outliers in {col}", fontsize=14)
-                            plt.xlabel(col)
+                            if not outliers.empty:
+                                outlier_data_list.append({
+                                    'Column' : col,
+                                    'Outliers' : outliers
+                                })
 
-                            # Save the plot to a BytesIO object (in-memory image)
-                            img_buffer = BytesIO()
-                            plt.savefig(img_buffer, format='png')
-                            img_buffer.seek(0)
+                selected_columns = input_col_outlier[:(col_outlier)]
 
-                            # Convert the image to base64 encoding for embedding in HTML
-                            img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
-                            img_buffer.close()
+                rows_subplot = int(input("Please specify the number of rows to be used for the subplots :"))
+                columns_subplot = int(input("Please specify the number of columns to be used for the subplots :"))
+
+                fig, axes = plt.subplots(rows_subplot, columns_subplot, figsize=(12, 5))    
+
+                for i, col in enumerate(selected_columns):
+                    sns.boxplot(x=df[col], ax=axes[i], color='salmon')
+                    axes[i].set_title(f"Outliers in {col}", fontsize=14)
+                    plt.xlabel(col)
+
+                    plt.tight_layout()
+
+                    img_buffer = BytesIO()
+                    plt.savefig(img_buffer, format='png')
+                    img_buffer.seek(0)
+
+                    img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+                    img_buffer.close()
 
                     outliers_df = pd.DataFrame(outlier_col_list)
+                    outliers_data_df = pd.DataFrame(outlier_data_list)
                     outliers_df_html = outliers_df.to_html()
-                                       
+                    outliers_data_df_html = outliers_data_df.to_html()                                       
 
             break
         except ValueError as e:
@@ -219,7 +232,10 @@ def data_summary(df):
         file.write("<br />")
         file.write("<h2>Outliers in Columns</h2>\n")
         file.write(outliers_df_html)
-        file.write("<h3>Boxplot of UnitPrice (with Outliers):</h3>")
+        file.write("<hr>\n")
+        file.write(outliers_data_df_html)
+        file.write("<hr>\n")        
+        file.write("<h3>Boxplot (with Outliers):</h3>")
         file.write(f"<img src='data:image/png;base64,{img_base64}' alt='Boxplot' />\n")        
         file.write("<hr>\n")       
         file.write("<br />")
@@ -326,6 +342,7 @@ def data_summary_wout_args(df):
                     raise ValueError(f"You must enter exactly {col_outlier} column names.")
                 else:
                     outlier_col_list=[]
+                    outlier_data_list = []                    
                     for col in input_col_outlier:
                         if col not in df.columns:
                             raise ValueError(f"'{col}' is not found in table.")
@@ -342,27 +359,40 @@ def data_summary_wout_args(df):
                                 'Q3' : Q3,
                                 'IQR' : IQR,
                                 'Lower bound' : lower_bound,
-                                'Upper bound' : upper_bound,
-                                'Outliers' : outliers
+                                'Upper bound' : upper_bound
                             })
+                            
+                            if not outliers.empty:
+                                outlier_data_list.append({
+                                    'Column' : col,
+                                    'Outliers' : outliers
+                                })
 
-                            # Step 3: Plot Boxplot for Outliers and Save it as an Image
-                            plt.figure(figsize=(6, 4))
-                            sns.boxplot(x=df[col], color='salmon')
-                            plt.title(f"Outliers in {col}", fontsize=14)
-                            plt.xlabel(col)
+                selected_columns = input_col_outlier[:(col_outlier)]
 
-                            # Save the plot to a BytesIO object (in-memory image)
-                            img_buffer = BytesIO()
-                            plt.savefig(img_buffer, format='png')
-                            img_buffer.seek(0)
+                rows_subplot = int(input("Please specify the number of rows to be used for the subplots :"))
+                columns_subplot = int(input("Please specify the number of columns to be used for the subplots :"))
 
-                            # Convert the image to base64 encoding for embedding in HTML
-                            img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
-                            img_buffer.close()
+                fig, axes = plt.subplots(rows_subplot, columns_subplot, figsize=(12, 5))    
+
+                for i, col in enumerate(selected_columns):
+                    sns.boxplot(x=df[col], ax=axes[i], color='salmon')
+                    axes[i].set_title(f"Outliers in {col}", fontsize=14)
+                    plt.xlabel(col)
+
+                    plt.tight_layout()
+
+                    img_buffer = BytesIO()
+                    plt.savefig(img_buffer, format='png')
+                    img_buffer.seek(0)
+
+                    img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+                    img_buffer.close()
 
                     outliers_df = pd.DataFrame(outlier_col_list)
+                    outliers_data_df = pd.DataFrame(outlier_data_list)
                     outliers_df_html = outliers_df.to_html()
+                    outliers_data_df_html = outliers_data_df.to_html()
                                        
 
             break
@@ -444,8 +474,11 @@ def data_summary_wout_args(df):
         file.write(null_df_html)
         file.write("<br />")
         file.write("<h2>Outliers in Columns</h2>\n")
-        file.write(outliers_df_html)   
-        file.write("<h3>Boxplot of UnitPrice (with Outliers):</h3>")
+        file.write(outliers_df_html)
+        file.write("<hr>\n")
+        file.write(outliers_data_df_html)
+        file.write("<hr>\n")
+        file.write("<h3>Boxplot (with Outliers):</h3>")
         file.write(f"<img src='data:image/png;base64,{img_base64}' alt='Boxplot' />\n")        
         file.write("<hr>\n")
         file.write("<br />")
