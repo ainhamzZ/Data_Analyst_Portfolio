@@ -7,8 +7,52 @@ from ydata_profiling import ProfileReport
 import os
 import openpyxl
 
+def fix_data_types(df):
+    """
+    This function checks and fixes data types in a DataFrame:
+    - Converts object columns to string if they contain only text.
+    - Converts numeric columns to int or float if needed.
+    - Converts date columns to datetime.
+    - Replaces invalid values with NaN.
+    """
+    
+    for col in df.columns:
+        # Detect missing values
+        missing_values = df[col].isna().sum()
+        
+        # Attempt to infer column data type
+        if df[col].dtype == 'datetime64':  
+            try:
+                df[col] = pd.to_datetime(df[col], errors='coerce')  # Try converting to datetime
+                if df[col].notna().sum() > 0:  # If at least one value was successfully converted
+                    print(f" Column '{col}' converted to datetime.")
+                    continue
+            except Exception:
+                pass  
+        
+        elif df[col].dtype == 'object':
+            # Check if column contains only strings
+            if all(isinstance(x, str) or pd.isna(x) for x in df[col]):
+                df[col] = df[col].astype(str)
+                print(f" Column '{col}' converted to string.")
+            else:
+                print(f" Warning: Column '{col}' contains mixed types.")
+
+        elif df[col].dtype in ['int64', 'float64']:  # Already numeric
+            df[col] = pd.to_numeric(df[col], errors='coerce')  # Ensure no incorrect types
+            print(f" Column '{col}' remains numeric.")
+
+        else:
+            print(f" Column '{col}' is already correct ({df[col].dtype}).")
+
+        # Report missing values after conversion
+        if missing_values > 0:
+            print(f" Column '{col}' has {missing_values} missing values.")
+
+
 
 def clean_data(df):
+
 
 # Drop duplicate rows
     while True:
