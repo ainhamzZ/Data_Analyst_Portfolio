@@ -1,0 +1,7 @@
+streamlit
+pandas
+numpy
+matplotlib
+ta
+pycaret[full]
+scikit-learn
